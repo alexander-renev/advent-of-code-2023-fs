@@ -1,2 +1,7 @@
 ﻿// For more information see https://aka.ms/fsharp-console-apps
-printfn "Hello from F#"
+
+open AdventOfCode2023.Solutions.Days
+open AdventOfCode2023.Solutions.Common
+
+let day = Day02() :> DayBase
+day.Execute()

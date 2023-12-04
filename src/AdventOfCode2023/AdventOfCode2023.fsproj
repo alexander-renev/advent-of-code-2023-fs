@@ -3,10 +3,24 @@
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <TargetFramework>net8.0</TargetFramework>
+        <LangVersion>preview</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Program.fs"/>
+        <Compile Include="Inputs\InputHelper.fs" />
+        <EmbeddedResource Include="Inputs\day01-real.txt" />
+        <EmbeddedResource Include="Inputs\day01-part1-test.txt" />
+        <EmbeddedResource Include="Inputs\day01-part2-test.txt" />
+        <EmbeddedResource Include="Inputs\day02-test.txt" />
+        <EmbeddedResource Include="Inputs\day02-real.txt" />
+        <Compile Include="Solutions\Common.fs" />
+        <Compile Include="Solutions\Day01.fs" />
+        <Compile Include="Solutions\Day02.fs" />
+        <Compile Include="Program.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="FParsec" Version="1.1.1" />
     </ItemGroup>
 
 </Project>
