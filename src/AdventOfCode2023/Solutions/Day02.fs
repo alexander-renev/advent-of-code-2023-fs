@@ -1,31 +1,33 @@
-﻿namespace AdventOfCode2023.Solutions.Days
+﻿module AdventOfCode2023.Solutions.Days.Day02
 
 open System.Collections.Generic
 open AdventOfCode2023.Solutions.Common
+open AdventOfCode2023.Solutions.Utils
 open FParsec
 
 [<Struct>]
 type Color = Blue | Red | Green
+
 [<Struct>]
 type Card = { Number: int; Combinations: IDictionary<Color, int> list }
 
-type Day02() =
-    inherit DayBase(2)
-    
-    override this.SolvePart1(input) =
-        let sum =
-            this.ParseInput input
-            |> Seq.filter this.SuitsForPart1
-            |> Seq.map _.Number
-            |> Seq.sum
-        printfn $"Sum is {sum}"
-                              
-    override this.SolvePart2(input) =
-        let sum =
-            this.ParseInput input
-            |> Seq.map this.ProcessCardForPart2
-            |> Seq.sum
-        printfn $"Sum is {sum}"
+type Solution() =
+    interface ISolution with
+        override this.Input = createInput 2
+        override this.SolvePart1(input) =
+            let sum =
+                this.ParseInput input
+                |> Seq.filter this.SuitsForPart1
+                |> Seq.map _.Number
+                |> Seq.sum
+            printfn $"Sum is {sum}"
+                                  
+        override this.SolvePart2(input) =
+            let sum =
+                this.ParseInput input
+                |> Seq.map this.ProcessCardForPart2
+                |> Seq.sum
+            printfn $"Sum is {sum}"
         
     member private this.SuitsForPart1(card: Card) =
         let existing = dict [ (Color.Red, 12); (Color.Green, 13); (Color.Blue, 14) ]
@@ -52,7 +54,7 @@ type Day02() =
             pint32
             .>> spaces
             .>>. colorParser
-            |>> SwapParts
+            |>> swapParts
         let combinationsParser = sepBy combinationParser (pstring ", ") |>> dict
         let gameParser =
             pstring "Game "
