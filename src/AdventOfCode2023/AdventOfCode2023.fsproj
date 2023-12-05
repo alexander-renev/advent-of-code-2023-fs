@@ -13,10 +13,16 @@
         <EmbeddedResource Include="Inputs\day01-part2-test.txt" />
         <EmbeddedResource Include="Inputs\day02-test.txt" />
         <EmbeddedResource Include="Inputs\day02-real.txt" />
+        <EmbeddedResource Include="Inputs\day03-test.txt" />
+        <EmbeddedResource Include="Inputs\day03-real.txt" />
+        <EmbeddedResource Include="Inputs\day04-test.txt" />
+        <EmbeddedResource Include="Inputs\day04-real.txt" />
         <Compile Include="Solutions\Common.fs" />
         <Compile Include="Solutions\Utils.fs" />
         <Compile Include="Solutions\Day01.fs" />
         <Compile Include="Solutions\Day02.fs" />
+        <Compile Include="Solutions\Day03.fs" />
+        <Compile Include="Solutions\Day04.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 

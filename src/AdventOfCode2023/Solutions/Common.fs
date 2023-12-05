@@ -31,7 +31,6 @@ let createCustomInput (day: int) (factory: Input -> IInputWrapper) = factory <| 
 let createInput (day: int) = createCustomInput day (fun input -> DefaultInputWrapper(input))
 
 let executeSolution(solution: ISolution) =
-    let input = solution.Input
     Console.WriteLine("Test data")
     solution.SolvePart1(solution.Input.GetPart01(false))
     solution.SolvePart2(solution.Input.GetPart02(false))
