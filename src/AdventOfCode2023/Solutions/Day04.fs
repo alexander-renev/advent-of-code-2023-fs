@@ -23,8 +23,10 @@ type Solution() =
                             |> Set.intersect card.ExistingNumbers
                             |> Seq.length
                         with
-                        | 0 -> int64 0
-                        | x -> Seq.replicate (x-1) (int64 2) |> Seq.fold (*) (int64 1)
+                        | 0 -> 0L
+                        | x ->
+                            Seq.replicate (x-1) 2L
+                            |> Seq.fold (*) 1L
                     )
                 |> Seq.sum
             printfn $"Sum is {sum}"
@@ -43,14 +45,13 @@ type Solution() =
                         card.WinningNumbers
                         |> Set.intersect card.ExistingNumbers
                         |> Seq.length
-                        
-                    if count > 0 then
-                        seq { card.Number + 1 .. card.Number + count }
-                        |> Seq.iter (
-                            fun id ->
-                                let found, currentValue = cardsCount.TryGetValue(id)
-                                if found then cardsCount[id] <- currentValue + cardsCount[card.Number]))
-            
+                    match count with
+                    | x when x > 0 -> seq { card.Number + 1 .. card.Number + x }
+                    | _ -> Seq.empty
+                    |> Seq.filter cardsCount.ContainsKey
+                    |> Seq.iter (
+                        fun id ->
+                            cardsCount[id] <- cardsCount[id] + cardsCount[card.Number]))
             let sum =
                 cardsCount.Values
                 |> Seq.sum

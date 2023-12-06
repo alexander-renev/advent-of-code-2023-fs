@@ -50,19 +50,21 @@ type Solution() =
                 parsed.Lines
                 |> Seq.mapi (
                     fun y line ->
-                        let matches = digitRegex.Matches line
-                        parsed.Asterisks
-                        |> Seq.collect (
-                            fun gear ->
-                                matches
-                                |> Seq.filter(
-                                    fun mtch ->
-                                        gear.Y >= y - 1 &&
-                                        gear.Y <= y + 1 &&
-                                        gear.X >= mtch.Index - 1 &&
-                                        gear.X <= mtch.Index + mtch.Length)
-                                |> Seq.map (fun mtch -> (gear, Int64.Parse(mtch.Value)))
-                            )
+                        digitRegex.Matches line
+                        |> fun matches ->
+                            parsed.Asterisks
+                            |> Seq.collect (
+                                fun gear ->
+                                    matches
+                                    |> Seq.filter(
+                                        fun mtch ->
+                                            gear.Y >= y - 1 &&
+                                            gear.Y <= y + 1 &&
+                                            gear.X >= mtch.Index - 1 &&
+                                            gear.X <= mtch.Index + mtch.Length)
+                                    |> Seq.map (fun mtch -> (gear, Int64.Parse(mtch.Value)))
+                                )
+                        
                     )
                 |> Seq.collect id
                 |> Seq.groupBy fst
@@ -72,7 +74,7 @@ type Solution() =
                     fun nums ->
                         nums
                         |> Seq.map snd
-                        |> Seq.fold (*) (int64 1)
+                        |> Seq.fold (*) 1L
                         )
             printfn $"Sum is {gears}"
     
@@ -89,13 +91,13 @@ type Solution() =
             
         let symbols =
             source
-            |> Seq.filter (fun (_, ch) -> ignoreChars.Contains(ch) = false)
+            |> Seq.filter (fun p -> ignoreChars.Contains(snd p) = false)
             |> Seq.map fst
             |> Seq.toList
                       
         let asterisks =
             source
-            |> Seq.filter (fun (_, ch) -> ch = '*')
+            |> Seq.filter (fun p -> snd p = '*')
             |> Seq.map fst
             |> Seq.toList
 
