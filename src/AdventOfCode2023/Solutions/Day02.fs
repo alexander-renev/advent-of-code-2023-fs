@@ -42,7 +42,7 @@ type Solution() =
                 card.Combinations
                 |> Seq.map (fun combination -> snd <| combination.TryGetValue(color))
                 |> Seq.max)
-        |> Seq.fold (*) 1
+        |> Seq.reduce (*)
     
     member private x.ParseInput(input: string) =
         let colorParser = choice [

@@ -74,7 +74,7 @@ type Solution() =
                     fun nums ->
                         nums
                         |> Seq.map snd
-                        |> Seq.fold (*) 1L
+                        |> Seq.reduce (*)
                         )
             printfn $"Sum is {gears}"
     

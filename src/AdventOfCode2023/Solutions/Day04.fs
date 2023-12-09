@@ -26,7 +26,7 @@ type Solution() =
                         | 0 -> 0L
                         | x ->
                             Seq.replicate (x-1) 2L
-                            |> Seq.fold (*) 1L
+                            |> Seq.reduce (*)
                     )
                 |> Seq.sum
             printfn $"Sum is {sum}"
