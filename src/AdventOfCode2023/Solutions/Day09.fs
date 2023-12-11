@@ -34,11 +34,10 @@ type Solution() =
         samples
         |> this.MakeLists
         |> Seq.map Seq.head
-        |> (fun x -> (x, 0))
+        |> pairWith 0
         ||> Seq.foldBack (
             fun acc value ->
-                acc - value
-                )
+                acc - value)
 
     member private this.MakeLists(samples: int list) =
         samples
@@ -51,7 +50,8 @@ type Solution() =
                     |> Seq.pairwise
                     |> Seq.map (fun (x1, x2) -> x2 - x1)
                     |> Seq.toList
-                    |> fun x -> Some(list, x)
+                    |> reversePairWith list
+                    |> Some
             )
     member private this.ParseInput(input: string) =
         input
@@ -59,7 +59,7 @@ type Solution() =
         |> Seq.map(
             fun line ->
                 line
-                |> fun l -> l.Split(' ')
+                |> _.Split(' ')
                 |> Seq.map Int32.Parse
                 |> Seq.toList
             )

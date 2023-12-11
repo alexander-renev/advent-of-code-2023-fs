@@ -11,6 +11,10 @@ let whitespace1 x = many1(pchar ' ') x
 
 let whitespace x = many(pchar ' ') x
 
+let pairWith b a = (a, b)
+
+let reversePairWith b a = (b, a)
+
 let (<!>) (p: Parser<_,_>) label : Parser<_,_> =
     fun stream ->
         printfn $"%A{stream.Position}: Entering %s{label}"
