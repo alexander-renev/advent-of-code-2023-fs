@@ -33,6 +33,8 @@
         <EmbeddedResource Include="Inputs\day10-real.txt" />
         <EmbeddedResource Include="Inputs\day11-test.txt" />
         <EmbeddedResource Include="Inputs\day11-real.txt" />
+        <EmbeddedResource Include="Inputs\day12-test.txt" />
+        <EmbeddedResource Include="Inputs\day12-real.txt" />
         <Compile Include="Solutions\Common.fs" />
         <Compile Include="Solutions\Utils.fs" />
         <Compile Include="Solutions\Day01.fs" />
@@ -46,11 +48,13 @@
         <Compile Include="Solutions\Day09.fs" />
         <Compile Include="Solutions\Day10.fs" />
         <Compile Include="Solutions\Day11.fs" />
+        <Compile Include="Solutions\Day12.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="FParsec" Version="1.1.1" />
+      <PackageReference Include="FSharpPlus" Version="1.5.0" />
     </ItemGroup>
 
 </Project>
