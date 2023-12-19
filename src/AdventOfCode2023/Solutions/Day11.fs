@@ -86,32 +86,31 @@ let calculate (source: Cell array array) (count: int64) =
         |> Seq.sum
     total / 2L
     
-    
+let parseInput(input: string) =
+    input
+    |> getLines
+    |> Seq.map (
+        fun line ->
+            line.ToCharArray()
+            |> Seq.map (
+                fun ch ->
+                    if ch = '#' then Galaxy
+                    else Space { X = 1L; Y = 1L }
+                )
+            |> Seq.toArray
+        )
+    |> Seq.toArray
+
 type Solution() =
     interface ISolution with
         override this.Input = createInput 11
         
         override this.SolvePart1(input) =
-            let source = this.ParseInput input
+            let source = parseInput input
             let total = calculate source 2L
             printfn $"Sum is {total}"
                                   
         override this.SolvePart2(input) =
-            let source = this.ParseInput input
+            let source = parseInput input
             let total = calculate source 1_000_000L
             printfn $"Sum is {total}"
-    
-    member private this.ParseInput(input: string) =
-        input
-        |> getLines
-        |> Seq.map (
-            fun line ->
-                line.ToCharArray()
-                |> Seq.map (
-                    fun ch ->
-                        if ch = '#' then Galaxy
-                        else Space { X = 1L; Y = 1L }
-                    )
-                |> Seq.toArray
-            )
-        |> Seq.toArray

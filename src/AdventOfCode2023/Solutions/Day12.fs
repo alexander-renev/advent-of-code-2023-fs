@@ -8,7 +8,7 @@ open AdventOfCode2023.Solutions.Utils
 
 type State = Operational | Damaged | Unknown
 
-type Line = { States: LinkedList<State>; Numbers: LinkedList<int> }
+type Line = { States: State list; Numbers: int list }
 
 let printList (list: 'a seq) = $"""[{String.Join("; ", list)}]"""
 
@@ -17,17 +17,6 @@ let toLinkedList(source: 'a seq) =
     source
     |> Seq.iter (fun x -> result.AddLast x |> ignore)
     result
-    
-let remaining(current: LinkedListNode<'a>) =
-    if current = null then
-        Seq.empty
-    else
-        seq {
-            let mutable item = current.Next
-            while item <> null do
-                yield item
-                item <- item.Next
-        }
 
 let parseInput (input: string) =
     input
@@ -45,92 +34,43 @@ let parseInput (input: string) =
                         | '.' -> Operational
                         | _ -> failwith $"Unknown state {ch}"
                     )
-                |> toLinkedList
+                |> Seq.toList
             let numbers =
                 parts[1].Split(',')
                 |> Seq.map Int32.Parse
-                |> toLinkedList
+                |> Seq.toList
             { States = springs; Numbers = numbers }
         )
     |> Seq.toList
-    
-let tryMove(position: LinkedListNode<State>) (count: int): LinkedListNode<State> option =
-    if count = 1 then
-        if position.Next <> null && position.Next.Value <> Damaged then
-            Some position.Next
-        elif position.Next = null then
-            Some position
-        else
-            None
+
+let cache = Dictionary<Line, int64>()
+let rec calculateVariantsNumber (line: Line): int64 =
+    let found, result = cache.TryGetValue line
+    if found then result
     else
-        let nextValues =
-            remaining position
-            |> Seq.toList
-        if Seq.length nextValues < count - 1 then
-            None
-        elif
-            Seq.length nextValues = count - 1 then
-                if nextValues |> Seq.forall (fun v -> v.Value <> Operational) then
-                    Some <| Seq.last nextValues
-                else None
-        elif
-            Seq.length nextValues = count then
-                let nextMatch =
-                    nextValues |> Seq.take (count - 1) |> Seq.forall (fun v -> v.Value <> Operational)
-                let lastMatch = Seq.last(nextValues).Value <> Damaged
-                if nextMatch && lastMatch then
-                    Some <| Seq.last nextValues
-                else
-                    None
-        elif 
-            nextValues |> Seq.take (count - 1) |> Seq.forall (fun v -> v.Value <> Operational)
-            then
-                let after =
-                    nextValues
-                    |> Seq.skip (count - 1)
-                    |> Seq.head
-                if after.Value = Damaged then
-                    None
-                else
-                    Some after
+        if List.isEmpty line.Numbers then
+            let result = if line.States |> List.forall (fun state -> state <> Damaged) then 1 else 0
+            cache.Add(line, result)
+            result
+        elif List.isEmpty line.States then 0
         else
-            None
-                    
-let rec calculateVariantsRec (linePosition: LinkedListNode<State>) (numberPosition: LinkedListNode<int>): int =
-    if
-        ((remaining linePosition) |> Seq.filter (fun p -> p.Value <> Operational) |> Seq.length) <
-        ((remaining numberPosition) |> Seq.map _.Value |> Seq.sum) then
-        0
-    elif numberPosition = null then
-        if linePosition = null
-            then 1
-        elif linePosition.Value <> Damaged && (remaining linePosition |> Seq.forall (fun p -> p.Value <> Damaged))
-            then 1
-        else
-            0
-    elif linePosition = null then
-        0
-    elif linePosition.Value = Operational then
-        if linePosition.Next = null then 0
-        else calculateVariantsRec linePosition.Next numberPosition
-    elif linePosition.Value = Damaged then
-        // next n values must be damaged, and then should be end or not damaged
-        let damagedCount = numberPosition.Value
-        match tryMove linePosition damagedCount with
-        | Some newPosition when newPosition.Next <> null -> calculateVariantsRec newPosition.Next numberPosition.Next
-        | Some _ -> calculateVariantsRec null numberPosition.Next
-        | _ -> 0
-    else
-        linePosition.Value <- Damaged
-        let ifDamaged = calculateVariantsRec linePosition numberPosition
-        linePosition.Value <- Operational
-        let ifOperational = calculateVariantsRec linePosition numberPosition
-        linePosition.Value <- Unknown
-        ifDamaged + ifOperational
-let calculateVariantsNumber (line: Line) =
-    let result = calculateVariantsRec line.States.First line.Numbers.First
-    printf "."
-    result
+            let skipped = if line.States.Head = Damaged then 0L else calculateVariantsNumber { line with States = line.States.Tail }
+            let count = line.Numbers.Head
+            let remaining = List.length(line.States)
+            let notSkipped =
+                if remaining >= count && line.States |> Seq.take count |> Seq.forall (fun x -> x <> Operational) then
+                    if remaining = count then
+                        if List.length(line.Numbers) = 1 then 1L else 0L
+                    else
+                        if line.States |> Seq.skip count |> Seq.head = Damaged then 0L
+                        else
+                            calculateVariantsNumber { States = line.States |> List.skip (count + 1); Numbers  = line.Numbers.Tail }
+                else
+                    0L
+            let result = skipped + notSkipped    
+            cache.Add(line, result)
+            result
+     
 
 type Solution() =
     interface ISolution with
@@ -154,15 +94,12 @@ type Solution() =
                             List.replicate 5 (List.ofSeq line.States)
                             |> List.intersperse (List.singleton Unknown)
                             |> List.collect id
-                            |> toLinkedList
                         let newNumbers =
                             List.replicate 5 (List.ofSeq line.Numbers)
                             |> List.collect id
-                            |> toLinkedList
                         { Numbers  = newNumbers; States = newStates }
                     )
                 |> Seq.toArray
-                |> Array.Parallel.map calculateVariantsNumber
+                |> Seq.map calculateVariantsNumber
                 |> Seq.sum
             printfn $"Sum is {sum}"
-            ()

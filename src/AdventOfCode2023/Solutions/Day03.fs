@@ -11,16 +11,41 @@ type Point = { X: int; Y: int; }
 
 type InputData = { Lines: string list; Symbols: Point list; Asterisks: Point list }
 
+let digitRegex = Regex("\\d+", RegexOptions.Compiled)
+    
+let ignoreChars = HashSet<char>("0123456789.".ToCharArray())
+
+let parseInput(input: string) =
+    let lines = getLines input |> Seq.toList
+    
+    let source =
+        lines
+        |> Seq.mapi (fun y line -> (y, line))
+        |> Seq.collect (
+            fun (y, line) ->
+                line |>
+                Seq.mapi (fun x ch -> ({X = x; Y = y}, ch)))
+        
+    let symbols =
+        source
+        |> Seq.filter (fun p -> ignoreChars.Contains(snd p) = false)
+        |> Seq.map fst
+        |> Seq.toList
+                  
+    let asterisks =
+        source
+        |> Seq.filter (fun p -> snd p = '*')
+        |> Seq.map fst
+        |> Seq.toList
+
+    { Lines = lines; Symbols = symbols; Asterisks = asterisks }
+
 type Solution() =
-    let digitRegex = Regex("\\d+", RegexOptions.Compiled)
-    
-    let ignoreChars = HashSet<char>("0123456789.".ToCharArray())
-    
     interface ISolution with
         override this.Input = createInput 3
         
         override this.SolvePart1(input) =
-            let parsed = this.parseInput input
+            let parsed = parseInput input
             let sum =
                 parsed.Lines
                 |> Seq.mapi (
@@ -45,7 +70,7 @@ type Solution() =
             printfn $"Sum is {sum}"
                                   
         override this.SolvePart2(input) =
-            let parsed = this.parseInput input
+            let parsed = parseInput input
             let gears =
                 parsed.Lines
                 |> Seq.mapi (
@@ -77,28 +102,3 @@ type Solution() =
                         |> Seq.reduce (*)
                         )
             printfn $"Sum is {gears}"
-    
-    member private x.parseInput(input: string) =
-        let lines = getLines input |> Seq.toList
-        
-        let source =
-            lines
-            |> Seq.mapi (fun y line -> (y, line))
-            |> Seq.collect (
-                fun (y, line) ->
-                    line |>
-                    Seq.mapi (fun x ch -> ({X = x; Y = y}, ch)))
-            
-        let symbols =
-            source
-            |> Seq.filter (fun p -> ignoreChars.Contains(snd p) = false)
-            |> Seq.map fst
-            |> Seq.toList
-                      
-        let asterisks =
-            source
-            |> Seq.filter (fun p -> snd p = '*')
-            |> Seq.map fst
-            |> Seq.toList
-
-        { Lines = lines; Symbols = symbols; Asterisks = asterisks }
