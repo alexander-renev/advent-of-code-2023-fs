@@ -17,8 +17,7 @@ let makeLists(samples: int list) =
                 |> Seq.map (fun (x1, x2) -> x2 - x1)
                 |> Seq.toList
                 |> reversePairWith list
-                |> Some
-        )
+                |> Some)
 
 let getNextValue(samples: int list) =
     samples
@@ -32,8 +31,7 @@ let getPreviousValue(samples: int list): int =
     |> Seq.map Seq.head
     |> pairWith 0
     ||> Seq.foldBack (
-        fun acc value ->
-            acc - value)
+        fun acc value -> acc - value)
 
 let ParseInput(input: string) =
     input
@@ -43,8 +41,7 @@ let ParseInput(input: string) =
             line
             |> _.Split(' ')
             |> Seq.map Int32.Parse
-            |> Seq.toList
-        )
+            |> Seq.toList)
     |> Seq.toList
 
 type Solution() =

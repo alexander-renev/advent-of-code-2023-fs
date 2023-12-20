@@ -1,6 +1,5 @@
 ﻿module AdventOfCode2023.Solutions.Days.Day14
 
-open System
 open System.Collections.Generic
 open System.Text
 open AdventOfCode2023.Solutions.Common
@@ -19,23 +18,17 @@ let parsePosition =
         | '.' -> Empty
         | x -> failwith $"Unknown position {x}"
         
-let printPosition pos =
-    match pos with
+let printPosition =
+    function
     | Round -> 'O'
     | Cube -> '#'
     | Empty -> '.'
 
 let parseInput (input: string) =
     let result = Dictionary<_, _>()
-    let lines = getLines input
-    lines
-    |> Seq.iteri (
-        fun y line ->
-            line
-            |> Seq.iteri (
-                fun x ch ->
-                    result[{ X = x; Y = y }] <- parsePosition ch)
-        )
+    for y, line in input |> getLines |> Seq.indexed do
+        for x, ch in line |> Seq.indexed do
+            result[{ X = x; Y = y }] <- ch |> parsePosition
     result
     
 let getWidth (input: Dictionary<Point, Position>) =
@@ -65,27 +58,25 @@ let getMovePoints (direction: Direction) (input: Dictionary<Point, Position>) =
         seq { 0 .. width } // x
         |> Seq.map (
             fun x ->
-                let ys = if direction = North then seq { 0 .. height } else seq { height .. -1 .. 0 }
-                ys
+                if direction = North then seq { 0 .. height } else seq { height .. -1 .. 0 }
                 |> Seq.map (fun y -> { X = x; Y = y })
-                |> Seq.toList
-            )
+                |> Seq.toList)
         |> Seq.toList
     else
         seq { 0 .. height } // y
         |> Seq.map (
             fun y ->
-                let xs = if direction = West then seq { 0 .. width } else seq { width .. -1 .. 0 }
-                xs
+                if direction = West then
+                    seq { 0 .. width }
+                else
+                    seq { width .. -1 .. 0 }
                 |> Seq.map (fun x -> { X = x; Y = y })
-                |> Seq.toList
-            )
+                |> Seq.toList)
         |> Seq.toList
     
 let move (direction:Direction) (input: Dictionary<Point, Position>) =
-    let movePoints = getMovePoints direction input
-    
-    movePoints
+    input
+    |> getMovePoints direction
     |> Seq.iter (
         fun points ->
         let mutable moved = true
@@ -101,10 +92,8 @@ let move (direction:Direction) (input: Dictionary<Point, Position>) =
             |> Option.iter (
                 fun (prev, pos) ->
                     input[prev] <- Round
-                    input[pos] <- Empty
-                )
-            moved <- Option.isSome positionToMove
-        )
+                    input[pos] <- Empty)
+            moved <- Option.isSome positionToMove)
     input
     
 let moveCycle (input: Dictionary<Point, Position>) =
@@ -154,12 +143,9 @@ type Solution() =
                             state + (steps - state) / period * period + 1
                         else
                             state + 1
-                    Some (newState, newState)
-                )
+                    Some (newState, newState))
             |> Seq.takeWhile (fun s -> s < steps)
             |> Seq.iter ignore
 
-            let weight =
-                parsed
-                |> getWeight
+            let weight = parsed |> getWeight
             printfn $"Total load is {weight}"

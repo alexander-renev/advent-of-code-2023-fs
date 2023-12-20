@@ -11,12 +11,12 @@ type Mirror = Horizontal of int | Vertical of int
 
 let parseSample(sample: string) =
     let rows =
-        getLines sample
+        sample
+        |> getLines
         |> Seq.map (
             fun line ->
                 line.ToCharArray()
-                |> Seq.toList
-            )
+                |> Seq.toList)
         |> Seq.toList
     let columns = rows |> List.transpose
     { Rows = rows; Columns  = columns }
@@ -44,8 +44,7 @@ let getCombinations (sourceList: char list list) =
     |> Seq.map (
         fun (x, y) ->
             let value = if source[y][x] = '#' then '.' else '#'
-            source.SetItem(y, source[y].SetItem(x, value))
-        )
+            source.SetItem(y, source[y].SetItem(x, value)))
     |> Seq.map (
         fun data ->
             let rows =
@@ -61,7 +60,7 @@ let describeLine item =
     let vertical =
         findMiddle item.Columns
         |> Seq.map Vertical
-    [horizontal; vertical]
+    seq { yield horizontal; yield vertical; }
     |> Seq.collect id
     |> Seq.map (
         fun found ->
@@ -94,9 +93,11 @@ type Solution() =
                 |> Seq.map (
                     fun line ->
                         let current =
-                            describeLine line
+                            line
+                            |> describeLine
                             |> List.exactlyOne
-                        getCombinations line.Rows
+                        line.Rows
+                        |> getCombinations
                         |> Seq.collect describeLine
                         |> Seq.distinct
                         |> Seq.filter (fun v -> v <> current)

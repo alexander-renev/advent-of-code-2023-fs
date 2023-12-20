@@ -43,6 +43,8 @@
         <EmbeddedResource Include="Inputs\day15-real.txt" />
         <EmbeddedResource Include="Inputs\day16-test.txt" />
         <EmbeddedResource Include="Inputs\day16-real.txt" />
+        <EmbeddedResource Include="Inputs\day17-test.txt" />
+        <EmbeddedResource Include="Inputs\day17-real.txt" />
         <Compile Include="Solutions\Common.fs" />
         <Compile Include="Solutions\Utils.fs" />
         <Compile Include="Solutions\Day01.fs" />
@@ -61,6 +63,7 @@
         <Compile Include="Solutions\Day14.fs" />
         <Compile Include="Solutions\Day15.fs" />
         <Compile Include="Solutions\Day16.fs" />
+        <Compile Include="Solutions\Day17.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 

@@ -3,7 +3,6 @@
 open System
 open System.Collections.Generic
 open AdventOfCode2023.Solutions.Common
-open AdventOfCode2023.Solutions.Days.Day14
 open AdventOfCode2023.Solutions.Utils
 
 [<Flags>]    
@@ -33,27 +32,23 @@ let print (mirrors: Mirrors) (visited: Visited) =
     let maxX = mirrors.Keys |> Seq.map (_.X) |> Seq.max
     let maxY = mirrors.Keys |> Seq.map (_.Y) |> Seq.max
     
-    seq { 0 .. maxY }
-    |> Seq.iter (
-        fun y ->
-            seq { 0 .. maxX }
-            |> Seq.iter (
-                fun x ->
-                    let point = { X = x; Y = y }
-                    let ch =
-                        if mirrors[point] <> '.' then mirrors[point]
-                        elif visited[point] = Direction.None then mirrors[point]
-                        else
-                            match visited[point] with
-                            | Direction.Down -> 'V'
-                            | Direction.Up -> '^'
-                            | Direction.Left -> '<'
-                            | Direction.Right -> '>'
-                            | x -> getCount x
-                    printf $"{ch}"
-                )
-            Console.WriteLine()
-        )
+    for y in seq { 0 .. maxY } do
+        for x in seq { 0 .. maxX } do
+            let point = { X = x; Y = y }
+            let ch =
+                if mirrors[point] <> '.' then
+                    mirrors[point]
+                elif visited[point] = Direction.None then
+                    mirrors[point]
+                else
+                    match visited[point] with
+                    | Direction.Down -> 'V'
+                    | Direction.Up -> '^'
+                    | Direction.Left -> '<'
+                    | Direction.Right -> '>'
+                    | x -> getCount x
+            printf $"{ch}"
+        Console.WriteLine()
 
 let moveNext (light: Light) =
     let position, direction = light
@@ -67,23 +62,23 @@ let moveNext (light: Light) =
     newPosition, direction
 
 let parseInput (input: string) =
-    getLines input
-    |> Seq.mapi (
-        fun y line ->
-            line
-            |> Seq.mapi (
-                fun x ch -> ({ X = x; Y = y }, ch)))
-    |> Seq.collect id
+    seq {
+        for y, line in input |> getLines |> Seq.indexed do
+            for x, ch in line |> Seq.indexed do
+                yield ({ X = x; Y = y }, ch)
+    }
     |> dict
     
 let getEnergizedCount (parsed: Mirrors) (start: Light) =
     let visited = Visited()
-    parsed |> Seq.iter (fun pair -> visited.Add(pair.Key, Direction.None))
+    for pair in parsed do
+        visited.Add(pair.Key, Direction.None)
     let queue = Queue<_>()
     queue.Enqueue start
     while queue.Count > 0 do
         let position, direction = queue.Dequeue()
-        if visited.ContainsKey(position) = false || visited[position] &&& direction = direction then ()
+        if visited.ContainsKey(position) = false || visited[position] &&& direction = direction then
+            ()
         else
             visited[position] <- visited[position] ||| direction
             let nextDirections =
@@ -113,10 +108,8 @@ let getEnergizedCount (parsed: Mirrors) (start: Light) =
                 | '-' ->
                     [Direction.Left; Direction.Right]
                 | _ -> failwith $"Unknown char {parsed[position]}"
-            nextDirections
-            |> Seq.iter (
-                fun newDirection ->
-                    queue.Enqueue <| moveNext (position, newDirection))
+            for newDirection in nextDirections do
+                queue.Enqueue <| moveNext (position, newDirection)
                     
     let energized =
         visited.Values
@@ -129,30 +122,25 @@ type Solution() =
         override this.Input = createInput 16
         
         override this.SolvePart1(input) =
-            let parsed = parseInput input
-            let energized = getEnergizedCount parsed ({ X = 0; Y = 0 }, Direction.Right)
+            let parsed = input |> parseInput
+            let energized = ({ X = 0; Y = 0 }, Direction.Right) |> getEnergizedCount parsed
             printfn $"{energized} energized tiles"
             ()
             
         override this.SolvePart2(input) =
-            let parsed = parseInput input
-            let getEnergized = getEnergizedCount parsed
+            let parsed = input |> parseInput
+            let getEnergized = parsed |> getEnergizedCount
             let maxX = parsed.Keys |> Seq.map (_.X) |> Seq.max
             let maxY = parsed.Keys |> Seq.map (_.Y) |> Seq.max
-            let vertical =
-                seq { 0 .. maxX }
-                |> Seq.map (
-                    fun x ->
-                        [ { X = x; Y = 0 }, Direction.Down; { X = x; Y = maxY }, Direction.Up ]
-                    )
-                |> Seq.collect id
-            let horizontal =
-                seq { 0 .. maxY }
-                |> Seq.map (
-                    fun y ->
-                        [ { X = 0; Y = y }, Direction.Right; { X = maxX; Y = y }, Direction.Left ]
-                    )
-                |> Seq.collect id
+            
+            let vertical = seq {
+                for x in seq { 0 .. maxX } do
+                    yield! [ { X = x; Y = 0 }, Direction.Down; { X = x; Y = maxY }, Direction.Up ]
+            }
+            let horizontal = seq {
+                for y in seq { 0 .. maxY } do
+                    yield! [ { X = 0; Y = y }, Direction.Right; { X = maxX; Y = y }, Direction.Left ] 
+            }
             let maxEnergized =
                 vertical
                 |> Seq.append horizontal

@@ -11,10 +11,13 @@ type Color = Blue | Red | Green
 [<Struct>]
 type Card = { Number: int; Combinations: IDictionary<Color, int> list }
 
+let existing = dict [ (Color.Red, 12); (Color.Green, 13); (Color.Blue, 14) ]
+
 let suitsForPart1(card: Card) =
-    let existing = dict [ (Color.Red, 12); (Color.Green, 13); (Color.Blue, 14) ]
     card.Combinations
-    |> Seq.forall (Seq.forall (fun pair -> existing[pair.Key] >= pair.Value))
+    |> Seq.forall (
+        Seq.forall (
+            fun pair -> existing[pair.Key] >= pair.Value))
 
 let processCardForPart2(card: Card) =
     let colors = [Color.Red; Color.Green; Color.Blue]

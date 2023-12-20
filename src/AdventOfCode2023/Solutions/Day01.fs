@@ -10,11 +10,12 @@ let digitsMap = [ ("one", 1); ("two", 2); ("three", 3)
                   ("four", 4); ("five", 5); ("six", 6)
                   ("seven", 7); ("eight", 8); ("nine", 9)]
 
-let numberMap = dict (
+let numberMap = 
     digitsMap
     |> Seq.append (
         seq { 1 .. 9 }
-        |> Seq.map (fun i -> (i.ToString(), i))))
+        |> Seq.map (fun i -> (i.ToString(), i)))
+    |> dict
 
 let digitRegexp = Regex("\\d", RegexOptions.Compiled)
 
@@ -26,7 +27,7 @@ let getNumber(line: string) =
     numbers[0] * 10 + numbers[^0]
 
 let getNumberOrText(line: string) =
-    let validIndex = fun p -> snd p > -1
+    let validIndex = fun (_, p) -> p > -1
     
     let firstValue =
         numberMap

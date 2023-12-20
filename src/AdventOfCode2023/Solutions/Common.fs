@@ -36,4 +36,4 @@ let executeSolution(solution: ISolution) =
     solution.SolvePart2(solution.Input.GetPart02(false))
     Console.WriteLine("Real data")
     solution.SolvePart1(solution.Input.GetPart01(true))
-    solution.SolvePart2(solution.Input.GetPart02(true))
+    //solution.SolvePart2(solution.Input.GetPart02(true))

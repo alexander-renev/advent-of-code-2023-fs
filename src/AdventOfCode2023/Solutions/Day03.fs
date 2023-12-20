@@ -50,8 +50,7 @@ type Solution() =
                 parsed.Lines
                 |> Seq.mapi (
                     fun y line ->
-                        let matches = digitRegex.Matches line
-                        matches
+                        digitRegex.Matches line
                         |> Seq.filter (
                             fun mtch ->
                                 parsed.Symbols
@@ -60,11 +59,8 @@ type Solution() =
                                         smbl.Y >= y - 1 &&
                                         smbl.Y <= y + 1 &&
                                         smbl.X >= mtch.Index - 1 &&
-                                        smbl.X <= mtch.Index + mtch.Length                                        
-                                    )
-                            )
-                        |> Seq.map (fun mtch -> Int64.Parse(mtch.Value))
-                    )
+                                        smbl.X <= mtch.Index + mtch.Length))
+                        |> Seq.map (fun mtch -> Int64.Parse(mtch.Value)))
                 |> Seq.collect id
                 |> Seq.sum
             printfn $"Sum is {sum}"
@@ -87,18 +83,14 @@ type Solution() =
                                             gear.Y <= y + 1 &&
                                             gear.X >= mtch.Index - 1 &&
                                             gear.X <= mtch.Index + mtch.Length)
-                                    |> Seq.map (fun mtch -> (gear, Int64.Parse(mtch.Value)))
-                                )
-                        
-                    )
+                                    |> Seq.map (fun mtch -> (gear, Int64.Parse(mtch.Value)))))
                 |> Seq.collect id
                 |> Seq.groupBy fst
-                |> Seq.filter (fun (_, values) -> Seq.length(values) = 2)
+                |> Seq.filter (fun (_, values) -> values |> Seq.length = 2)
                 |> Seq.map snd
                 |> Seq.sumBy (
                     fun nums ->
                         nums
                         |> Seq.map snd
-                        |> Seq.reduce (*)
-                        )
+                        |> Seq.reduce (*) )
             printfn $"Sum is {gears}"

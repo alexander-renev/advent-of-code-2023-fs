@@ -5,21 +5,23 @@ open System.Collections.Generic
 open AdventOfCode2023.Solutions.Common
 open AdventOfCode2023.Solutions.Utils
 
-type InputHand = { Cards: string; Bet: int; }
+type InputHand = { Cards: string; Bet: int64; }
 
-type Hand = { Cards: string; Values: int array; Bet: int; Power: int; }
+type Hand = { Cards: string; Values: int array; Bet: int64; Power: int; }
 
 type Comparison = Greater | Less
 
-let cardValuesPart1 = dict(
+let cardValuesPart1 = 
     "23456789TJQKA".ToCharArray()
     |> Seq.indexed
-    |> Seq.map (fun (index, ch) -> (ch, index + 1)))
+    |> Seq.map (fun (index, ch) -> (ch, index + 1))
+    |> dict
 
-let cardValuesPart2 = dict(
+let cardValuesPart2 = 
     "J23456789TQKA".ToCharArray()
     |> Seq.indexed
-    |> Seq.map (fun (index, ch) -> (ch, index + 1)))
+    |> Seq.map (fun (index, ch) -> (ch, index + 1))
+    |> dict
 
 let getValues (valuesMap: IDictionary<char, int>) (text:string)  =
     text.ToCharArray()
@@ -33,15 +35,15 @@ let calculatePower(values: int array): int =
     let counts =
         values
         |> Seq.groupBy id
-        |> Seq.map (fun grp -> Seq.length <| snd grp)
-        |> Seq.sortByDescending id
+        |> Seq.map (fun (_, grp) -> Seq.length grp)
+        |> Seq.sortDescending
         |> Seq.toList
     match counts with
     | [_] -> 6
     | [4; _] -> 5
     | [3; _] -> 4
     | [3; _; _] -> 3
-    | [ 2; 2; _] -> 2
+    | [2; 2; _] -> 2
     | [_; _; _; _]  -> 1
     | [_; _; _; _; _] -> 0
     | _ -> failwith $"Cannot describe values {values}"
@@ -61,7 +63,7 @@ let maximizeHand (hand: InputHand) : Hand =
             hand.Cards.ToCharArray()
             |> Seq.filter (fun ch -> ch <> 'J')
             |> Seq.groupBy id
-            |> Seq.map (fun (key, values) -> (key, Seq.length(values)))
+            |> Seq.map (fun (key, values) -> (key, values |> Seq.length))
             |> Seq.sortByDescending snd
             |> Seq.tryHead
             |> Option.map fst
@@ -81,8 +83,7 @@ let compareHands (hand1: Hand) (hand2: Hand) =
             fun (h1, h2) ->
                 match compare h1 h2 with
                 | x when x <> 0 -> Some x
-                | _ -> None
-            )
+                | _ -> None)
         |> Seq.tryHead
         |> Option.defaultValue 0
 
@@ -91,9 +92,9 @@ let parseInput (input: string): InputHand array =
     lines
     |> Seq.map (
         fun line ->
-            let parts = line.Split(' ')
-            { Cards = parts[0]; Bet = Int32.Parse(parts[1]) }
-        )
+            match line.Split(' ') |> List.ofArray with
+            | [part1; part2] -> { Cards = part1; Bet = Int64.Parse(part2); }
+            | _ -> failwith "Expected list of 2 items")
     |> Seq.toArray
 
 type Solution() =
@@ -110,7 +111,7 @@ type Solution() =
                     { Cards = hand.Cards; Bet = hand.Bet; Values = values; Power = power })
                 |> Seq.sortWith compareHands
                 |> Seq.indexed
-                |> Seq.sumBy (fun (index, hand) -> int64(index + 1) * int64(hand.Bet))
+                |> Seq.sumBy (fun (index, hand) -> int64(index + 1) * hand.Bet)
             printfn $"Total is {win}"
                                   
         override this.SolvePart2(input) =
@@ -120,5 +121,5 @@ type Solution() =
                 |> Seq.map maximizeHand
                 |> Seq.sortWith compareHands
                 |> Seq.indexed
-                |> Seq.sumBy (fun (index, hand) -> int64(index + 1) * int64(hand.Bet))
+                |> Seq.sumBy (fun (index, hand) -> int64(index + 1) * hand.Bet)
             printfn $"Total is {win}"

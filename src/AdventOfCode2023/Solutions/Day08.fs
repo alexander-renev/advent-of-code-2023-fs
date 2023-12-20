@@ -34,16 +34,14 @@ let describeInput (start: string) (commands: Command list) (map: IDictionary<Str
                 | GoLeft -> map[position].Left
                 | GoRight -> map[position].Right
             result.Add (position, index, commandIndex)
-            visited.Add (position, commandIndex)
-        )
+            visited.Add (position, commandIndex))
     |> Seq.takeWhile id
-    |> Seq.reduce (fun a _ -> a)
-    |> ignore
+    |> Seq.iter ignore
     
     let duplicates =
         result
         |> Seq.groupBy (fun (position, _, commandIndex) -> (position, commandIndex))
-        |> Seq.filter (fun x -> Seq.length(snd x) > 1)
+        |> Seq.filter (fun (_, x) -> x |> Seq.length > 1)
         |> Seq.head
         |> snd
         |> Seq.toList

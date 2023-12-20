@@ -31,6 +31,9 @@ let iterateLinkedListReverse (lst: LinkedList<'a>) =
             if node = null then None
             else Some (node, node.Previous)
         )
+    
+    
+let kvp(a, b) = KeyValuePair<_, _>(a, b)
 
 let (<!>) (p: Parser<_,_>) label : Parser<_,_> =
     fun stream ->

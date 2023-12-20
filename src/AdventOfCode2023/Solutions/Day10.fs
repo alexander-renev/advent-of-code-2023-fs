@@ -45,12 +45,11 @@ let getLoop(input: Point array array) =
         |> Seq.map getPoint
         |> Seq.filter (
             fun p ->
-                getNeighbours p
+                p
+                |> getNeighbours
                 |> Option.map (
-                    fun (first, second) -> first = start || second = start
-                    )
-                |> Option.defaultValue false
-            )
+                    fun (first, second) -> first = start || second = start)
+                |> Option.defaultValue false)
         |> Seq.toList
     let neighbour = Seq.head neighbours
     let neighbourCoords =
@@ -62,9 +61,9 @@ let getLoop(input: Point array array) =
         |> Seq.map (fun dir -> { startPoint with Position = Pipe dir })
         |> Seq.choose (
             fun pt ->
-                getNeighbours pt
-                |> Option.map (fun nb -> (pt, nb))
-                )
+                pt
+                |> getNeighbours
+                |> Option.map (fun nb -> (pt, nb)))
         |> Seq.filter (
             fun (_, (first, second)) ->
                 neighbourCoords.Contains(first) && neighbourCoords.Contains(second))
@@ -72,13 +71,14 @@ let getLoop(input: Point array array) =
         |> Seq.map _.Position
         |> Seq.head
         
-    let loop = seq {
+    seq {
         yield { startPoint with Position = startPosition }
         let mutable previous = startPoint
         let mutable current = neighbour
         while current <> startPoint do
             yield current
-            getNeighbours current
+            current
+            |> getNeighbours
             |> Option.iter (
                 fun nbs ->
                     let newPrevious, newCurrent =
@@ -86,11 +86,8 @@ let getLoop(input: Point array array) =
                         | n, _ when n = previous.Coordinates -> (current, getPoint(snd nbs)) 
                         | _ -> (current, getPoint(fst nbs))
                     previous <- newPrevious
-                    current <- newCurrent
-                )
+                    current <- newCurrent)
     }
-    
-    loop
     |> Seq.toList
 
 let getPosition(p: char) =
@@ -112,8 +109,7 @@ let ParseInput (input: string) =
         fun y line ->
             line.ToCharArray()
             |> Seq.mapi (fun x ch -> { Coordinates = {X = x; Y = y}; Position = getPosition(ch) })
-            |> Seq.toArray
-        )
+            |> Seq.toArray)
     |> Seq.toArray
 
 type Solution() =
@@ -170,7 +166,6 @@ type Solution() =
                         |> Seq.map _.Coordinates
                         |> Seq.filter horizontalRight.Contains
                         |> Seq.length
-                        |> fun x -> x % 2 = 1
-                    )
+                        |> fun x -> x % 2 = 1)
                 |> Seq.length
             printfn $"Opened count {opened}"    

@@ -34,8 +34,7 @@ let parseInput2 (input: string) =
             if item.Contains '=' then
                 Replace (parts[0], Int32.Parse(parts[1]))
             else
-                Remove parts[0]
-        )
+                Remove parts[0])
     |> Seq.toList
 
 let getHash (text: string) =
@@ -86,8 +85,7 @@ type Solution() =
                         match existing with
                         | Some item -> item.ValueRef <- { Label  = s; Length = power; }
                         | None -> box.AddLast { Label  = s; Length = power; } |> ignore
-                        ()
-                )
+                        ())
             let lenses =
                 boxes.Values
                 |> Seq.collect id
@@ -95,20 +93,13 @@ type Solution() =
                 |> Seq.distinct
                 |> Seq.toList
             let power =
-                lenses
-                |> Seq.map (
-                    fun lens ->
-                        boxes
-                        |> Seq.map (
-                            fun box ->
-                                box.Value
-                                |> Seq.indexed
-                                |> Seq.filter (fun (_, l) -> l.Label = lens)
-                                |> Seq.map (fun (index, lens) -> (box.Key + 1) * (index + 1) * lens.Length)
-                                |> Seq.sum
-                            )
-                        |> Seq.sum
-                    )
+                seq {
+                    for lens in lenses do
+                        for box in boxes do
+                            for index, l in box.Value |> Seq.indexed do
+                                if l.Label = lens then
+                                    yield (box.Key + 1) * (index + 1) * l.Length
+                }
                 |> Seq.sum
             printfn $"Sum is {power}"
             ()

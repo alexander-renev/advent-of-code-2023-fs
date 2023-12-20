@@ -46,18 +46,18 @@ type Solution() =
                         with
                         | 0 -> 0L
                         | x ->
-                            Seq.replicate (x-1) 2L
-                            |> Seq.reduce (*)
-                    )
+                            2L
+                            |> Seq.replicate (x-1)
+                            |> Seq.reduce (*))
                 |> Seq.sum
             printfn $"Sum is {sum}"
                                   
         override this.SolvePart2(input) =
             let cards = parseInput input
-            let cardsCount = Dictionary<int, int>(
+            let cardsCount =
                 cards
-                |> Seq.map(fun card -> (card.Number, 1))
-                |> dict)
+                |> Seq.map(fun card -> (card.Number, 1) |> kvp)
+                |> Dictionary<_, _>
             
             cards
             |> Seq.iter (
@@ -66,9 +66,11 @@ type Solution() =
                         card.WinningNumbers
                         |> Set.intersect card.ExistingNumbers
                         |> Seq.length
-                    match count with
-                    | x when x > 0 -> seq { card.Number + 1 .. card.Number + x }
-                    | _ -> Seq.empty
+                    let cards =
+                        match count with
+                        | x when x > 0 -> seq { card.Number + 1 .. card.Number + x }
+                        | _ -> Seq.empty
+                    cards
                     |> Seq.filter cardsCount.ContainsKey
                     |> Seq.iter (
                         fun id ->
