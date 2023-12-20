@@ -1,2 +1,2 @@
 ﻿open AdventOfCode2023.Solutions.Common
-executeSolution <| AdventOfCode2023.Solutions.Days.Day13.Solution() 
+executeSolution <| AdventOfCode2023.Solutions.Days.Day16.Solution() 

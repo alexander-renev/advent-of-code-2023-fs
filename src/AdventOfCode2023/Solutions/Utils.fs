@@ -1,6 +1,7 @@
 ﻿module AdventOfCode2023.Solutions.Utils
 
 open System
+open System.Collections.Generic
 open FParsec
 
 let swapParts(a, b) = (b, a)
@@ -14,6 +15,22 @@ let whitespace x = many(pchar ' ') x
 let pairWith b a = (a, b)
 
 let reversePairWith b a = (b, a)
+
+let iterateLinkedList (lst: LinkedList<'a>) =
+    lst.First
+    |> Seq.unfold (
+        fun node ->
+            if node = null then None
+            else Some (node, node.Next)
+        )
+    
+let iterateLinkedListReverse (lst: LinkedList<'a>) =
+    lst.Last
+    |> Seq.unfold (
+        fun node ->
+            if node = null then None
+            else Some (node, node.Previous)
+        )
 
 let (<!>) (p: Parser<_,_>) label : Parser<_,_> =
     fun stream ->

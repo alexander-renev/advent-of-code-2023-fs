@@ -93,11 +93,13 @@ type Solution() =
                 parsed
                 |> Seq.map (
                     fun line ->
-                        let current = describeLine line |> List.exactlyOne
+                        let current =
+                            describeLine line
+                            |> List.exactlyOne
                         getCombinations line.Rows
                         |> Seq.collect describeLine
+                        |> Seq.distinct
                         |> Seq.filter (fun v -> v <> current)
-                        |> List.ofSeq
-                        |> _.Head)
+                        |> Seq.exactlyOne)
                 |> Seq.sum
             printfn $"Sum is {result}"
